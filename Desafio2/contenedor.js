@@ -37,24 +37,24 @@ class Contenedor {
         fs.promises
           .writeFile(path, JSON.stringify(data, null, 2))
           .then((res) => {
-            return {
+            return console.log({
               status: 'Succes',
               message: 'Escritura exitosa ' + '\n' + res,
               nuevoID: 'Producto con ID: ' + newId,
-            };
+            });
           })
           .catch((error) => {
-            return {
+            return console.log({
               status: 'Error',
               message: 'No se pudo escribir el Archivo' + error,
-            };
+            });
           });
       })
       .catch((error) => {
-        return {
+        return console.log({
           status: 'Error',
           message: 'No se pudo leer el Archivo' + error,
-        };
+        });
       });
   }
 
@@ -62,24 +62,24 @@ class Contenedor {
     fs.promises
       .readFile(path, 'utf-8')
       .then((data) => {
-        if (data.length == 0)
-          return { status: 'Error', message: 'Archivo Vacio' };
+        data = JSON.parse(data)
+        console.log(data)
+        if (data.length === 0)
+          return console.log({ status: 'Error', message: 'Archivo Vacio' });
         else {
-          const item = JSON.parse(data);
-          item.find((element) => {
-            element.id === id;
-            return element;
-          });
-        }
-        return element.length !== 0
-          ? element
-          : { status: 'Warning', message: 'No existe el elemento' };
-      })
-      .catch((err) => {
-        return {
+          let itemFind = data.find((element => element.id === id))
+            if(itemFind)
+              return console.log({status:'Succes',Item:itemFind});
+            else
+              return console.log({status: 'Warning', message: 'No existe el elemento' });
+          };
+
+        })
+        .catch((err) => {
+        return console.log({
           status: 'Error',
           message: 'Problemas de lectura con el Archivo\n' + err,
-        };
+        });
       });
   }
   getAll() {
@@ -87,30 +87,39 @@ class Contenedor {
       .readFile(path, 'utf-8')
       .then((data) => {
         if (data.length == 0)
-          return { status: 'Error', message: 'Archivo Vacio' };
+          return console.log({status: 'Error', message: 'Archivo Vacio'});
         else {
-          const item = JSON.parse(data);
-          return item;
+          const items = JSON.parse(data);
+          return console.log({status:'Succes',items:items});
         }
       })
       .catch((err) => {
-        return { status: 'Error', message: 'No se pudo leer el Archivo' };
+        return console.log({ status: 'Error', message: 'No se pudo leer el Archivo\n'+err });
       });
   }
 
-  //TODO
+  
   deleteByID(id){
     fs.promises.readFile(path,'utf-8')
     .then(data=>{
-      dataRead = JSON.parse(data)
+      const dataRead = JSON.parse(data)
       return dataRead
     })
     .then(res=>{
-      res.find(element=> {element.id === id
-        res = res.drop()
+      let resAct = res.filter(element=> element.id !== id)
+      if (resAct.length === res.length)
+       return console.log({status:'Warning', message:'No se Encontro el Item, ID: '+id+' Inconrrecto'})
+      else
+        fs.promises.writeFile(path,JSON.stringify(resAct,null,2))
+        .then(()=>{
+        return  console.log({status:'Succes', message:'Item Eliminado... ID: '+ id})
+        })
+        .catch(err=>{
+          return console.log({status:'Error', message:'El Item no pudo ser Borrado \n',err})
+        })
       })
-    })
   }
+  
 
   deleteAll(){
     fs.promises.writeFile(path,' ')
@@ -126,9 +135,20 @@ class Contenedor {
 const prueba = new Contenedor();
 
 const datos = {
-  title: 'vaso',
+  title: 'Olla',
   precio: '400',
   image: 'xxxx',
 };
 
-console.log(prueba.getByID(1));
+//Pruebas
+console.log('Agrega Item')
+prueba.saveData(datos)
+console.log('Eliminar por ID')
+prueba.deleteByID(18)
+console.log('Muestra Toda la Lista')
+prueba.getAll()
+console.log('Muestra Item por ID')
+prueba.getByID(13)
+
+console.log('Eliminar Todos los Items')
+//prueba.deleteAll()
