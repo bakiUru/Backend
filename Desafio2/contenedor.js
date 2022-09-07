@@ -40,6 +40,7 @@ class Contenedor {
             return {
               status: 'Succes',
               message: 'Escritura exitosa ' + '\n' + res,
+              nuevoID: 'Producto con ID: ' + newId,
             };
           })
           .catch((error) => {
@@ -80,6 +81,45 @@ class Contenedor {
           message: 'Problemas de lectura con el Archivo\n' + err,
         };
       });
+  }
+  getAll() {
+    fs.promises
+      .readFile(path, 'utf-8')
+      .then((data) => {
+        if (data.length == 0)
+          return { status: 'Error', message: 'Archivo Vacio' };
+        else {
+          const item = JSON.parse(data);
+          return item;
+        }
+      })
+      .catch((err) => {
+        return { status: 'Error', message: 'No se pudo leer el Archivo' };
+      });
+  }
+
+  //TODO
+  deleteByID(id){
+    fs.promises.readFile(path,'utf-8')
+    .then(data=>{
+      dataRead = JSON.parse(data)
+      return dataRead
+    })
+    .then(res=>{
+      res.find(element=> {element.id === id
+        res = res.drop()
+      })
+    })
+  }
+
+  deleteAll(){
+    fs.promises.writeFile(path,' ')
+    .then(()=>{
+      return{status:'Succes', message:'Contenido Eliminado'}
+    })
+    .catch(err=>{
+      return{status:'Error', message:'El archivo no pudo ser Borrado'+err}
+    })
   }
 }
 
