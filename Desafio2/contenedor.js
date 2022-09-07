@@ -1,11 +1,11 @@
-const fs = require("fs");
-const path = "./utils/products.txt";
+const fs = require('fs');
+const path = './utils/products.txt';
 
 class Contenedor {
   //Guardamos los datos en el Archivo
   saveData(data) {
     fs.promises
-      .readFile(path, "utf-8")
+      .readFile(path, 'utf-8')
       .then((res) => {
         //Convierto la cadena de texto a objeto
         let dataRead = JSON.parse(res);
@@ -16,16 +16,15 @@ class Contenedor {
           while (
             dataRead.find((element) => {
               element.length < newId;
-              console.log("ID de cada elemento: ", element.id);
-              newId=element.id +1;
+              console.log('ID de cada elemento: ', element.id);
+              newId = element.id + 1;
             })
           );
 
-          console.log("Nuevo id:", newId); 
-          
+          console.log('Nuevo id:', newId);
+
           data = Object.assign({ id: newId }, data);
           dataRead.push(data);
-
         } else {
           newId = 1;
           data = Object.assign([{ id: newId }, data]);
@@ -34,39 +33,62 @@ class Contenedor {
       })
       //Escribimos en el Archivo
       .then((data) => {
-        console.log("Lo que Va a Guardar: " + data);
+        console.log('Lo que Va a Guardar: ' + data);
         fs.promises
           .writeFile(path, JSON.stringify(data, null, 2))
           .then((res) => {
             return {
-              status: "Succes",
-              message: "Escritura exitosa " + "\n" + res,
+              status: 'Succes',
+              message: 'Escritura exitosa ' + '\n' + res,
             };
           })
           .catch((error) => {
             return {
-              status: "Error",
-              message: "No se pudo escribir el Archivo" + error,
+              status: 'Error',
+              message: 'No se pudo escribir el Archivo' + error,
             };
           });
       })
       .catch((error) => {
         return {
-          status: "Error",
-          message: "No se pudo leer el Archivo" + error,
+          status: 'Error',
+          message: 'No se pudo leer el Archivo' + error,
         };
       });
   }
 
-
+  getByID(id) {
+    fs.promises
+      .readFile(path, 'utf-8')
+      .then((data) => {
+        if (data.length == 0)
+          return { status: 'Error', message: 'Archivo Vacio' };
+        else {
+          const item = JSON.parse(data);
+          item.find((element) => {
+            element.id === id;
+            return element;
+          });
+        }
+        return element.length !== 0
+          ? element
+          : { status: 'Warning', message: 'No existe el elemento' };
+      })
+      .catch((err) => {
+        return {
+          status: 'Error',
+          message: 'Problemas de lectura con el Archivo\n' + err,
+        };
+      });
+  }
 }
 
 const prueba = new Contenedor();
 
 const datos = {
-  title: "vaso",
-  precio: "400",
-  image: "xxxx",
+  title: 'vaso',
+  precio: '400',
+  image: 'xxxx',
 };
 
-prueba.saveData(datos);
+console.log(prueba.getByID(1));
