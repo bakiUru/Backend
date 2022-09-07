@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "lampara",
+    "price": "1000",
+    "image": "xxxx"
+  },
+  {
+    "id": 2,
+    "title": "Sofa",
+    "price": "35000",
+    "image": "xxxx"
+  },
+  {
+    "id": 3,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  },
+  {
+    "id": 4,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  },
+  {
+    "id": 7,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  },
+  {
+    "id": 6,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  },
+  {
+    "id": 7,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  },
+  {
+    "id": 8,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  },
+  {
+    "id": 9,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  },
+  {
+    "id": 10,
+    "title": "vaso",
+    "precio": "400",
+    "image": "xxxx"
+  }
+]
