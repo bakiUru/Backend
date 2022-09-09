@@ -1,5 +1,5 @@
 const fs = require("fs");
-const path = "./utils/products.txt";
+const path = 'products.txt';
 
 class Contenedor {
   //Guardamos los datos en el Archivo
@@ -41,9 +41,8 @@ class Contenedor {
           });
       } else {
         newId = 1;
-        console.log('1'+dataRead)
-        dataRead.push(({ id: newId }, data));
-        console.log(dataRead)
+        dataRead.push({ id: 1 ,...data});
+        console.log('Primer Articulo: '+ dataRead)
         //Escribimos en el Archivo por primera vez
         fs.promises
           .writeFile(path, JSON.stringify( dataRead, null, 2))
