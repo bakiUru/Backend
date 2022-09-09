@@ -4,9 +4,13 @@ const path = "./utils/products.txt";
 class Contenedor {
   //Guardamos los datos en el Archivo
   saveData(data) {
-    fs.promises.readFile(path, "utf-8").then((res) => {
+    
+    fs.promises.readFile(path, "utf-8")
+    .then((res) => {
       //Convierto la cadena de texto a objeto
+      console.log(res)
       let dataRead = JSON.parse(res);
+      console.log(dataRead)
       //genero el nuevo ID
       let newId = 1;
       //Compruebo si el Id fue eliminado
@@ -18,6 +22,7 @@ class Contenedor {
         console.log("Nuevo id:", newId);
         data = Object.assign({ id: newId }, data);
         dataRead.push(data);
+
         //Escribimos en el Archivo
         fs.promises
           .writeFile(path, JSON.stringify(dataRead, null, 2))
@@ -36,10 +41,12 @@ class Contenedor {
           });
       } else {
         newId = 1;
-        dataRead = Object.assign({ id: newId }, data);
+        console.log('1'+dataRead)
+        dataRead.push(({ id: newId }, data));
+        console.log(dataRead)
         //Escribimos en el Archivo por primera vez
         fs.promises
-          .writeFile(path, JSON.stringify([dataRead], null, 2))
+          .writeFile(path, JSON.stringify( dataRead, null, 2))
           .then(() => {
             return console.log({
               status: "Succes",
@@ -53,7 +60,14 @@ class Contenedor {
             });
           });
       }
-    });
+    }).catch(err=>{
+      return console.log({status:'Error', message:'El archivo no Existe o esta Corrupto ' + err})
+    })
+          
+
+ 
+      
+  
   }
 
   getByID(id) {
@@ -61,7 +75,6 @@ class Contenedor {
       .readFile(path, "utf-8")
       .then((data) => {
         data = JSON.parse(data);
-        console.log(data);
         if (data.length === 0)
           return console.log({ status: "Error", message: "Archivo Vacio" });
         else {
@@ -136,7 +149,7 @@ class Contenedor {
 
   deleteAll() {
     fs.promises
-      .writeFile(path, "[]")
+      .writeFile(path, '[]')
       .then(() => {
         return { status: "Succes", message: "Contenido Eliminado" };
       })
@@ -149,23 +162,5 @@ class Contenedor {
   }
 }
 
-const prueba = new Contenedor();
+module.exports =Contenedor;
 
-const datos = {
-  title: "Olla",
-  precio: "400",
-  image: "xxxx",
-};
-
-//Pruebas
-console.log("Agrega Item");
-prueba.saveData(datos);
-//console.log('Eliminar por ID')
-//prueba.deleteByID(13)
-//console.log('Muestra Toda la Lista')
-//prueba.getAll()
-//console.log('Muestra Item por ID')
-//prueba.getByID(13)
-
-//console.log('Eliminar Todos los Items')
-//prueba.deleteAll()
