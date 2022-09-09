@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Lampara",
+    "price": 878,
+    "img": "xxx"
+  },
+  {
+    "id": 2,
+    "name": "Lampara",
+    "price": 878,
+    "img": "xxx"
+  },
+  {
+    "id": 3,
+    "name": "Lampara",
+    "price": 878,
+    "img": "xxx"
+  },
+  {
+    "id": 4,
+    "name": "Lampara",
+    "price": 878,
+    "img": "xxx"
+  },
+  {
+    "id": 5,
+    "name": "Lampara",
+    "price": 878,
+    "img": "xxx"
+  }
+]

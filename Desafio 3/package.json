@@ -1,0 +1,23 @@
+{
+  "name": "desafio-3",
+  "version": "1.0.0",
+  "description": "Desafio 3",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bakiUru/Backend.git"
+  },
+  "author": "Marcelo Rodriguez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bakiUru/Backend/issues"
+  },
+  "homepage": "https://github.com/bakiUru/Backend#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.19"
+  }
+}
