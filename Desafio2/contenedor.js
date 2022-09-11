@@ -1,72 +1,80 @@
 const fs = require("fs");
-const path = 'products.txt';
+const path = "./utils/products.txt";
 
 class Contenedor {
   //Guardamos los datos en el Archivo
   saveData(data) {
-    
-    fs.promises.readFile(path, "utf-8")
-    .then((res) => {
-      //Convierto la cadena de texto a objeto
-      console.log(res)
-      let dataRead = JSON.parse(res);
-      console.log(dataRead)
-      //genero el nuevo ID
-      let newId = 1;
-      //Compruebo si el Id fue eliminado
-      if (dataRead.length != 0) {
-        while (dataRead.find((element) => element.id === newId)) {
-          newId++;
-          console.log("Testeando ID:", newId);
+    fs.promises
+      .readFile(path, "utf-8")
+      .then((res) => {
+        //Convierto la cadena de texto a objeto
+        console.log(res);
+        let dataRead = JSON.parse(res);
+        console.log(dataRead);
+        //genero el nuevo ID
+        let newId = 1;
+        //Compruebo si el Id fue eliminado
+        if (dataRead.length != 0) {
+          while (dataRead.find((element) => element.id === newId)) {
+            newId++;
+            console.log("Testeando ID:", newId);
+          }
+          console.log("Nuevo id:", newId);
+          data = Object.assign({ id: newId }, data);
+          dataRead.push(data);
+
+          //Escribimos en el Archivo
+          fs.promises
+            .writeFile(path, JSON.stringify(dataRead, null, 2))
+            .then(() => {
+              return console.log({
+                status: "Succes",
+                message: "Escritura exitosa Producto Agregado",
+                nuevoID: "El nuevo ID: " + newId,
+              });
+            })
+            .catch((error) => {
+              return console.log({
+                status: "Error",
+                message: "No se pudo escribir el Archivo " + error,
+              });
+            });
+        } else {
+          console.log(dataRead);
+          dataRead.push({ id: 1, ...data });
+          console.log("Primer Articulo: " + dataRead);
+          //Escribimos en el Archivo por primera vez
+          fs.promises
+            .writeFile(path, JSON.stringify(dataRead, null, 2))
+            .then(() => {
+              return console.log({
+                status: "Succes",
+                message: "Escritura exitosa Producto Agregado",
+              });
+            })
+            .catch((error) => {
+              return console.log({
+                status: "Error",
+                message: "No se pudo escribir el Archivo " + error,
+              });
+            });
         }
-        console.log("Nuevo id:", newId);
-        data = Object.assign({ id: newId }, data);
-        dataRead.push(data);
-
-        //Escribimos en el Archivo
-        fs.promises
-          .writeFile(path, JSON.stringify(dataRead, null, 2))
-          .then(() => {
-            return console.log({
-              status: "Succes",
-              message: "Escritura exitosa Producto Agregado",
-              nuevoID: "El nuevo ID: " + newId,
-            });
-          })
-          .catch((error) => {
-            return console.log({
-              status: "Error",
-              message: "No se pudo escribir el Archivo " + error,
-            });
-          });
-      } else {
-        newId = 1;
-        dataRead.push({ id: 1 ,...data});
-        console.log('Primer Articulo: '+ dataRead)
-        //Escribimos en el Archivo por primera vez
-        fs.promises
-          .writeFile(path, JSON.stringify( dataRead, null, 2))
-          .then(() => {
-            return console.log({
-              status: "Succes",
-              message: "Escritura exitosa Producto Agregado",
-            });
-          })
-          .catch((error) => {
-            return console.log({
-              status: "Error",
-              message: "No se pudo escribir el Archivo " + error,
-            });
-          });
-      }
-    }).catch(err=>{
-      return console.log({status:'Error', message:'El archivo no Existe o esta Corrupto ' + err})
-    })
-          
-
- 
-      
-  
+      })
+      .catch(() => {
+        fs.promises.writeFile(path, "[]");
+      })
+      .then(() => {
+        return console.log({
+          status: "Succes",
+          message: "El archivo Fue Creado en: " + path,
+        });
+      })
+      .catch((err) => {
+        return console.log({
+          status: "Error",
+          message: "El archivo no Pudo ser Creado " + err,
+        });
+      });
   }
 
   getByID(id) {
@@ -148,7 +156,7 @@ class Contenedor {
 
   deleteAll() {
     fs.promises
-      .writeFile(path, '[]')
+      .writeFile(path, "[]")
       .then(() => {
         return { status: "Succes", message: "Contenido Eliminado" };
       })
@@ -161,5 +169,4 @@ class Contenedor {
   }
 }
 
-module.exports =Contenedor;
-
+module.exports = Contenedor;
