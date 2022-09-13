@@ -14,9 +14,9 @@ server.on('Error',err=>{console.log('Error  en servidor'+err)})
 
 app.get('/',(req,res)=>{
   res.send(`<h1>Bienvenidos</h1>
-  <div>
+  <div style="display : grid">
     <div>
-    <button style="padding = 1rem" ><a href='/productos'>Productos</a></button>
+    <button style="padding = 2rem" ><a href='/productos'>Productos</a></button>
     </div>
     <div>
     <button ><a href='/productoRandom'>Producto Random</a></button>
@@ -31,15 +31,20 @@ const producto = {
     img: 'xxx'
 }
 
-app.get('/productos', (req,res)=>{
-    res.send(data.getAll())
+app.get('/productos', async (req,res)=>{
+    const itemList =  await data.getAll()
+    console.log(typeof(itemList))
+    
+    res.send(itemList.items)
 })
 
-const randomID =()=>{
-    return Math.round(Math.random()*(6-1)+1)
 
-}
-randomID()
-app.get('/productoRandom', (req,res)=>{
-    res.send(data.getByID(randomID()))
+
+
+app.get('/productoRandom',async (req,res)=>{
+    const itemList =  await data.getAll()
+    let numeroID =Math.round(Math.random()*((itemList.items.length)-1)+1)
+    const dataItem = data.getByID(numeroID,itemList.items)
+    console.log('Lista:', itemList, 'NumeroRandom:', numeroID, 'ItemEncontrado:',dataItem.Item)
+    res.send( dataItem.Item)
 })
