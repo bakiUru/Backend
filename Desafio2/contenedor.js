@@ -1,5 +1,5 @@
 const fs = require("fs");
-const path = "./utils/products.txt";
+const path = "./products.txt";
 
 class Contenedor {
   //Guardamos los datos en el Archivo
@@ -77,48 +77,36 @@ class Contenedor {
       });
   }
 
-  getByID(id) {
-    fs.promises
-      .readFile(path, "utf-8")
-      .then((data) => {
-        data = JSON.parse(data);
+  getByID(id,data) {
         if (data.length === 0)
-          return console.log({ status: "Error", message: "Archivo Vacio" });
+          return ({ status: "Error", message: "Archivo Vacio" });
         else {
           let itemFind = data.find((element) => element.id === id);
           if (itemFind)
-            return console.log({ status: "Succes", Item: itemFind });
+            return ({ status: "Succes", Item: itemFind })                               
           else
-            return console.log({
+            return ({
               status: "Warning",
               message: "No existe el elemento",
             });
         }
-      })
-      .catch((err) => {
-        return console.log({
+  } 
+   getAll = async() =>{
+    try{
+      const data = await fs.promises.readFile(path, "utf-8")
+           if (data.length == 0)
+             return console.log({ status: "Error", message: "Archivo Vacio" });
+           else {
+             const items = JSON.parse(data);
+            return ({ status: "Succes", items: items })
+           }
+    }
+      catch(err){
+        return ({
           status: "Error",
-          message: "Problemas de lectura con el Archivo\n" + err,
+          message: "No se pudo leer el Archivo" + err,
         });
-      });
-  }
-  getAll() {
-    fs.promises
-      .readFile(path, "utf-8")
-      .then((data) => {
-        if (data.length == 0)
-          return console.log({ status: "Error", message: "Archivo Vacio" });
-        else {
-          const items = JSON.parse(data);
-          return console.log({ status: "Succes", items: items });
-        }
-      })
-      .catch((err) => {
-        return console.log({
-          status: "Error",
-          message: "No se pudo leer el Archivo\n" + err,
-        });
-      });
+      };
   }
 
   deleteByID(id) {
