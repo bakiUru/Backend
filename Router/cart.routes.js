@@ -15,18 +15,25 @@ routerCart.get('/',(req,res)=>{
 //cart.addItem({id: 3,nombre: 'pepi', apellido:'muñeco'})
 res.send('estamos en el cart')
 })
-
+routerCart.get('/:cid',(req,res,next)=>{
+    if(cart.getCart(req.params.cid)==undefined)
+        cart.storeCart()
+    next()
+})
 routerCart.get('/:cid',(req,res)=>{
     console.log(cart.getItem(req.params.cid))
     res.send('estamos buscando el id en el carro')
 })
-
+routerCart.post('/:cid/products/:pid', (req,res,next)=>{
+    if(cart.getCart(req.params.cid)==undefined)
+        cart.storeCart()
+    next()
+})
 routerCart.post('/:cid/products/:pid', (req,res)=>{
         const {cid,pid} = req.params
         
         //const prodFind = prod.getProductsbyID(pid)
         const cartFind = cart.getCart(cid) 
-        console.log(cartFind.length)
         if (cartFind.length > 0 || cartFind == cid)
             {
             //console.log('Encontre carrito', cartFind)
