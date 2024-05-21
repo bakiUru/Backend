@@ -17,7 +17,29 @@ router.get('/',async (req,res,next)=>{
     }
     next()
 })
+
 router.get('/:pid',async(req,res,next)=>{
+    try{
+        allProd = await reloadProducts_Controller()
+        console.log(allProd)
+    }catch(error)
+    {
+        console.log(error)
+    }
+    next();
+})
+
+router.delete('/:pid',async(req,res,next)=>{
+    try{
+        allProd = await reloadProducts_Controller()
+        console.log(allProd)
+    }catch(error)
+    {
+        console.log(error)
+    }
+    next();
+})
+router.put('/:pid',async(req,res,next)=>{
     try{
         allProd = await reloadProducts_Controller()
         console.log(allProd)
@@ -40,41 +62,27 @@ router.get('/:pid',async (req,res)=>{
 })
 
 router.post('/',async(req,res)=>{
-    const {title, description, price, thumbnail, code, stock} = req.body
-    let pruebita = await createProduct_Controller(title, description, price, thumbnail, code, stock)
-    console.log(pruebita)
-    res.status(200).send()
-    /*
-    console.log('Esto es lo que recibo',req.body)
-    prod.productAdd(title, description, price, thumbnail, code, stock)
-    .then(data=>{ 
-        console.log(data)
-        if (data != undefined)
-            res.status(201).send({message:'producto agregado', data:data})
-        else
-            throw new Error ('El producto no pudo ser Agregado')
-        })
-    .catch(error=>{
-        res.send({message: error.message})
-    })*/
+    const {title, description, price, thumbnail, code, category, stock} = req.body
+    let newProduct = await createProduct_Controller(title, description, price, thumbnail, code, category, stock)
     
-
+    res.status(newProduct.status).send(newProduct.data)
 })
 
 router.delete('/:pid',(req,res)=>{
-    prod.deleteProduct(req.params.pid)
+    prod.deleteProduct(allProd,req.params.pid)
     .then(data=>{
+        console.log(data)
         if (data?.messageError)
-            res.send(data.messageError)
+            res.status(data.status).send(data.messageError)
         else
-            res.send(data)
+            res.status(data.status).send(data)
     })
 
   
 })
 router.put('/:pid',(req,res)=>{
-    const {title, description, price, thumbnail, code, stock} = req.body
-    prod.putProduct(req.params.pid,title, description, price, thumbnail, code, stock)
+    const {title, description, price, thumbnail, code, category, stock} = req.body
+    prod.putProduct(allProd,req.params.pid,title, description, price, thumbnail, code, category, stock)
     .then(data=>{
         if (data?.messageError)
             res.send(data.messageError)

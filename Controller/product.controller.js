@@ -5,9 +5,9 @@ const data = new ProductManager()
 const reloadProducts_Controller = async()=>{
         return  data.getProducts().then(
             products => {
-                console.log(products.length)
+               // console.log(products.length)
                 if (products.length>0)
-                    return {message:'tenemos productos en pruebita', data: products,status: 200}
+                    return {message:'Tenemos Produtctos', data: products,status: 200}
                 else
                     return {message:'no tenemos nada que mostrar ERROR DE CONEXION A LA BD', data: [], status:400}
             })
@@ -18,8 +18,10 @@ const reloadProducts_Controller = async()=>{
 const findProducts_Controller = async (id)=>{
     let productfind = await reloadProducts_Controller()
     productfind = data.getProductsbyID(productfind.data,id)
-    if(productfind!={})
-                return {message: `Econtramos producto ${id}`, data:  productfind,status: 200}
+    console.log('dentro del controller',productfind)
+    console.log('longitud del controller',productfind.length)
+    if(productfind.length!=0)
+                return {message: `Econtramos producto ${id}`, data: productfind,status: 200}
             else
                 return {message: `No se encuentra el producto ${id}, en nuestra BD`, data: [],status: 400}
 
@@ -28,9 +30,17 @@ const findProducts_Controller = async (id)=>{
 const createProduct_Controller = async(...product)=>{
     console.log('Recibo',product)
     product.length!={}?
-    product= {message: await product.data.message,data: await data.productAdd(...product),status:201} : product= {message:'No se agrego el producto',data:[], status: 400}
-    console.log('Devuelvo',product)
-    return product
+    product= { data: await data.productAdd(...product),status:201} : product= {message:'No se agrego el producto',data:[], status: 400}
+    if (product.data?.error)
+        return {data:product.data.error,status:400}
+    else{
+        console.log('Devuelvo',product)
+        return product
+    }
 }
+
+
+//TODO
+//CONTROLADOR DE DEL Y PUT
 
 module.exports = {reloadProducts_Controller, findProducts_Controller,createProduct_Controller};

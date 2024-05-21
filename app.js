@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const router = require('./Router/products.routes')
+const routerCart = require('./Router/cart.routes')
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3000
@@ -10,8 +11,11 @@ app.use(express.json())
     .use(express.urlencoded({extended: true}))
     .use('/api/products',router)
     .use('/api/products/:id',router)
+    .use('/api/cart',routerCart)
 
 
+//TODO RUTA STATIC
+app.use('/static',express.static(__dirname+'public'))
 
 app.listen(PORT, ()=>{
     console.log(`Server escuchando en el puerto ${PORT}`)

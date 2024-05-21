@@ -1,13 +1,15 @@
-const file = require('../../Utils/fileManager')
+const file = require('../Data/fileManager')
 
 class Product {
-    constructor(title,description,price,thumbnail,code,stock)
+    constructor(title,description,price,thumbnail,code,category,stock)
     {
         this.title = title;
         this.description = description;
         this.price = price;
         this.thumbnail = thumbnail;
         this.code = code;
+        this.status = true;
+        this.category = category;
         this.stock = stock;
     }
     getPrice(){
@@ -21,6 +23,12 @@ class Product {
     } 
     getCode(){
         return this.code
+    } 
+    getCategory(){
+        return this.category
+    } 
+    getStatus(){
+        return this.status
     } 
     getStock(){
         return this.stock
@@ -37,37 +45,38 @@ class ProductManager{
         this.path = file.filePath;
         this.products = [];
     }
-   async productAdd(title,description,price,thumbnail,code,stock){
-        const prod = new Product(title,description,price,thumbnail,code,stock)
+   async productAdd(title,description,price,thumbnail,code,category,stock){
+        const prod = new Product(title,description,price,thumbnail,code,category,stock)
         console.log('ID a generar ACEPTADO: ',this.idGeneration(this.products))
-        prod.id = this.idGeneration(this.products);
         if (this.products.length>0)
             {
                 console.log('Hay : ',this.products.length)
                 console.log('es : ',typeof(this.products))
                 this.products= await file.readProduct()
                 .then(data=>{
-                console.log(this.products)
-                return JSON.parse(data)
+                    console.log('Al agregar, tengo estos productos',this.products)
+                    return JSON.parse(data)
                 })
                 .catch(e =>{
                     console.error(e.message)
                 })
                 if (this.products.find(product => product.code === code))
-                    return {message:`El Codigo del Producto ya existe --->  ${code}  NO SE INGRESO EL PRODUCTO: ${prod.title}`}
+                    return {error:`El Codigo del Producto ya existe --->  ${code}  NO SE INGRESO EL PRODUCTO: ${prod.title}`}
                 else{
+                    prod.id = this.idGeneration(this.products);
                     this.products.push(prod);
                     //Escribo en el archivo
                     await file.writeProduct(this.products)
                 }
         }else{
+            prod.id = this.idGeneration(this.products);
             //Es el primer producto
             this.products.push(prod);
             //Escribo en el archivo
             await file.writeProduct(this.products)
         }    
 
-        return {title,description,price,thumbnail,code,stock}
+        return {title,description,price,thumbnail,code,category,stock}
     }
 
    async getProducts(){
@@ -90,16 +99,19 @@ class ProductManager{
 
     }
 
-   async deleteProduct(id){
-        const product = this.getProductsbyID(this.products,id)
+   async deleteProduct({data},id){
+
+       console.log('esto hay antes de eliminar',data)
+        let product = this.getProductsbyID(data,id)
+        console.log('esto devuelve al eliminar',product)
         try{
-            if (product?.messageError)
-                throw new Error(product.messageError)
+            if (product.length == 0)
+                return {messageError:`Producto no encontrado para Eliminar: ID ${id}`,status:400}
             else{
                 //filtro todos los productos que no coinciden con ese array
-                this.products = this.products.filter(prod => prod.id != id)
+                this.products = data.filter(prod => prod.id != id)
                 await file.writeProduct(this.products)
-                return {message:'El producto fue Eliminado',data:{id:product.id,title:product.title}}
+                return {message:'El producto fue Eliminado',data:{id:product.id,title:product.title},status:200}
             }
         }catch(error){
             return {message:error.message}
@@ -107,14 +119,14 @@ class ProductManager{
         
     }
 
-    async putProduct(id,title,description,price,thumbnail,code,stock){
-        const product = this.getProductsbyID(this.products,id)
+    async putProduct({data},id,title,description,price,thumbnail,code,stock){
+        const product = this.getProductsbyID(data,id)
         try{
-            if (product?.messageError)
-                throw new Error(product.messageError)
+            if (product.length == 0)
+                return {messageError:`Producto no encontrado para Modificar: ID ${id}`,status:400}
             else{
                 //filtro todos los productos que no coinciden con ese array
-                this.products = this.products.filter(prod => prod.id != id)
+                this.products = data.filter(prod => prod.id != id)
                 //reemplazo los valores del producto
                 product.title = title==null?product.title:title
                 product.description = description==null?product.description:description
