@@ -4,8 +4,8 @@
   "description": "Proyecto BackendCoder",
   "main": "app.js",
   "scripts": {
-    "test": "run dev",
-    "start": "node --watch app.js"
+    "dev": "node --watch src/app.js",
+    "start": "node --watch src/app.js"
   },
   "author": "Marcelo Rodriguez",
   "license": "ISC",
@@ -13,8 +13,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-handlebars": "^7.1.2",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "node-localstorage": "^3.0.5"
+    "node-localstorage": "^3.0.5",
+    "socket.io": "^4.7.5"
   },
   "eslintConfig": {
     "extends": "standard"

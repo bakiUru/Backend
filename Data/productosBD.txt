@@ -1,1 +1,0 @@
-[{"title":"nuevoCon middleware 2.2","description":"esto es por post","price":123,"thumbnail":"dasdas","code":"21332333a","status":true,"category":"cosas Ricas","stock":223,"id":3},{"title":"nuevoCon middleware 2.2","description":"esto es por post","price":123,"thumbnail":"dasdas","code":"213321333a","status":true,"category":"cosas Ricas","stock":223,"id":4}]

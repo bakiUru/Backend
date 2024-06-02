@@ -1,0 +1,6 @@
+.product_list{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    background: black;
+}
