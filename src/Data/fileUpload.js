@@ -1,3 +1,3 @@
-const multer = require('multer')
+import multer from 'multer'
  
 const imagePath = multer({dest: '../uploads/img'})

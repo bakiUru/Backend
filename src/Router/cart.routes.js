@@ -1,8 +1,9 @@
-const routerCart = require('express').Router()
-const Cart = require('../Utils/cartManager')
-const Product = require('../Utils/productManager')
-const {findProducts_Controller} = require('../Controller/product.controller')
+import express  from 'express'
+import Cart from '../Utils/cartManager.js'
+import Product from '../Utils/productManager.js'
+import { findProducts_Controller } from '../Controller/product.controller.js'
 
+const routerCart =express.Router()
 const cart = new Cart()
 const prod = new Product()
 //AL ENTRAR AL CARRO GENERA EL OBJETO CART
@@ -64,4 +65,4 @@ routerCart.delete('/', (req,res)=>{
     res.send('Carrito Vacio')
 })
 
-module.exports = routerCart
+export default routerCart

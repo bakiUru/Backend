@@ -1,4 +1,4 @@
-const ProductManager = require('../Utils/productManager')
+import ProductManager from '../Utils/productManager.js'
 
 const data = new ProductManager()
 //Recarga los productos por alguna modificacion en tiempo de ejecucion
@@ -82,4 +82,4 @@ const filterData_Controller = (data)=>{
 //TODO
 //CONTROLADOR DE DEL Y PUT
 
-module.exports = {reloadProducts_Controller, findProducts_Controller,createProduct_Controller,filterData_Controller};
+export  {reloadProducts_Controller, findProducts_Controller,createProduct_Controller,filterData_Controller};

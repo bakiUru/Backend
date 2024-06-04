@@ -1,6 +1,7 @@
-const path = require('path')
-const LocalStorage = require('node-localstorage').LocalStorage;
-const localStorage = new LocalStorage(path.join(__dirname,'cart'));
+import { join } from 'path';
+import { LocalStorage } from 'node-localstorage';
+import { __dirname } from '../dirname.js';
+const localStorage = new LocalStorage(join(__dirname,'cart'));
 
 const CART_NAME = 'cart_Test'
 const CART_ID = 'cart_Test_ID'
@@ -90,4 +91,4 @@ storeCart(){
 
 }
 
-module.exports = CartManager;
+export default CartManager;

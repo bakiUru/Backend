@@ -1,8 +1,9 @@
-const fs = require('node:fs/promises')
-const {existsSync} = require('fs')
-const filePath = __dirname+'/productosBD.txt'
+import { promises as fs } from 'fs';
+import { existsSync } from 'fs'
+import { __dirname } from '../dirname.js';
+const filePath = __dirname +'/Data/productosBD.txt'
 
-
+console.log(filePath)
 //Estudiar con Generadores
 const  readProduct = async () =>{
     if (existsSync(filePath))
@@ -44,4 +45,4 @@ readProduct()
 writeProduct()
 readProduct()
 */
-module.exports = {readProduct,writeProduct,filePath}
+export default {readProduct,writeProduct,filePath}

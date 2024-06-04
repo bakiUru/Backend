@@ -1,6 +1,6 @@
 .product_list{
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    background: black;
+    justify-content: space-around;
+    background: rgb(99, 26, 26);
 }

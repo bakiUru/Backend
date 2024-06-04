@@ -1,15 +1,17 @@
-const router = require('express').Router()
-const {reloadProducts_Controller,findProducts_Controller,createProduct_Controller,filterData_Controller} = require('../Controller/product.controller')
-const ProductManager = require('../Utils/productManager')
-const serverSocket = require('../app')
+import express  from 'express'
+import { reloadProducts_Controller, findProducts_Controller, createProduct_Controller, filterData_Controller } from '../Controller/product.controller.js'
+import ProductManager from '../Utils/productManager.js'
+import { socketServer } from '../app.js'
 
-
+const router = express.Router()
 const prod = new ProductManager()
 let allProd
 
 
 //Obtenemos los Productos Middleware
 router.get('/',async (req,res,next)=>{
+    //prueba
+    socketServer.on('cliente:liveProduct', data=>console.log(data))
     try{
         allProd = await reloadProducts_Controller()
         //console.log(allProd)
@@ -114,4 +116,4 @@ router.put('/:pid',(req,res)=>{
 
 
 
-module.exports = router;
+export default router;

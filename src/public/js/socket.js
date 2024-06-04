@@ -11,12 +11,16 @@ socket.on('loadProducts',data=>
     })
 
 
-socket.on('servidor:liveProduct',console.log(data))
-
+socket.on('server:liveProduct',data=>{
+  console.log(data)
+  socket.emit('cliente:liveProduct', 'que es lo que queres')
+})
+socket.emit('cliente:liveProduct', 'que es lo que queres')
 //PRUEBA NOTIFICACION TOAST
 socket.on('connectUser', data =>{
     console.log(data)
     const popupHTML = document.getElementById('popup')
+    console.log(popupHTML)
     const toastHTML = document.getElementById('toastConecction')
     
     toastHTML.innerHTML += `

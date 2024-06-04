@@ -1,26 +1,28 @@
-const express = require('express')
-const path = require('path')
-const app = express()
+import  express  from 'express'
+import path  from 'path'
 //SOCKET
-const {Server} = require('socket.io')
+import {Server} from 'socket.io'
 //ROUTER
-const routerProduct = require('./Router/products.routes')
-const routerView = require('./Router/realTimeViews.routes')
-const routerCart = require('./Router/cart.routes')
+import routerProduct from './Router/products.routes.js'
+import routerView from './Router/realTimeViews.routes.js'
+import routerCart from './Router/cart.routes.js'
 //morgan para monitorear peticiones
-const morgan = require('morgan')
+import morgan  from 'morgan'
+//__dirname
+import { __dirname } from './dirname.js'
 //Para .env
-require('dotenv').config()
+import 'dotenv/config'
 //Handlebars
-const handlebars = require('express-handlebars')
-const { reloadProducts_Controller } = require('./Controller/product.controller')
+import handlebars from 'express-handlebars'
+import { reloadProducts_Controller } from './Controller/product.controller.js'
 
+const app = express()
 const PORT = process.env.PORT || 3000
+
 
 const httpServer  =  app.listen(PORT, ()=>{
         console.log(`Server escuchando en el puerto ${PORT}`)
     })
-
 const socketServer = new Server(httpServer)
 
 //morgan en desarrollo
@@ -55,12 +57,13 @@ app.get('/',(req,res)=>{
 
 })
 
-///WEBSOCKET 
-socketServer.on('connection', (socket) => {
+///WEBSOCKET TENGO PROBLEMAS PARA EXPORTARLO EN EL ARCHIVO
+socketServer.on('connection',async (socket) => {
 
     reloadProducts_Controller()
     .then(data=>{
         socket.emit('loadProducts',data.data)
+      
         
     }).catch(e=>{
         console.log(e) 
@@ -73,4 +76,4 @@ socketServer.on('connection', (socket) => {
     })
 })
 
-module.exports = socketServer
+export {socketServer}

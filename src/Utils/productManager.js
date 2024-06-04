@@ -1,4 +1,4 @@
-const file = require('../Data/fileManager')
+import file  from '../Data/fileManager.js'
 
 class Product {
     constructor(title,description,price,thumbnail,code,category,stock)
@@ -224,4 +224,4 @@ pM.getProducts().then(data=>{
 
 console.log('Producto por ID:',pM.getProductsbyID(1))
 */
-module.exports = ProductManager;
+export default ProductManager;
