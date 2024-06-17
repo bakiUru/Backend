@@ -1,5 +1,9 @@
 import  express  from 'express'
 import path  from 'path'
+//Conexion Mongo
+import mongoose from 'mongoose'
+import {connectDB} from './Data/MongoDB/connect.js'
+
 //SOCKET
 import {Server} from 'socket.io'
 //ROUTER
@@ -18,12 +22,18 @@ import { reloadProducts_Controller } from './Controller/product.controller.js'
 
 const app = express()
 const PORT = process.env.PORT || 3000
-
+//conexion a la BD
+connectDB(process.env.MONGO_URI,process.env.MONGO_DB)
 
 const httpServer  =  app.listen(PORT, ()=>{
         console.log(`Server escuchando en el puerto ${PORT}`)
     })
-const socketServer = new Server(httpServer)
+
+
+
+
+
+export const socketServer = new Server(httpServer)
 
 //morgan en desarrollo
 app.use(morgan('dev'))
@@ -69,11 +79,13 @@ socketServer.on('connection',async (socket) => {
         console.log(e) 
     })
     console.log('New client connected',socket.id);
-
+    
+    
+    socket.emit('liveProduct','sorete')
+    
     socket.broadcast.emit('connectUser',socket.id)
     socket.on('message', data =>{
         console.log(data)
     })
 })
 
-export {socketServer}

@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { existsSync } from 'fs'
-import { __dirname } from '../dirname.js';
+import { __dirname } from '../../dirname.js';
 const filePath = __dirname +'/Data/productosBD.txt'
 
 console.log(filePath)

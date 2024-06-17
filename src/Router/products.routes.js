@@ -2,10 +2,11 @@ import express  from 'express'
 import { reloadProducts_Controller, findProducts_Controller, createProduct_Controller, filterData_Controller } from '../Controller/product.controller.js'
 import ProductManager from '../Utils/productManager.js'
 import { socketServer } from '../app.js'
+import productModel from '../Data/MongoDB/Models/product.models.js'
 
 const router = express.Router()
 const prod = new ProductManager()
-let allProd
+let allProd, allProd_DB
 
 
 //Obtenemos los Productos Middleware
@@ -15,6 +16,8 @@ router.get('/',async (req,res,next)=>{
     try{
         allProd = await reloadProducts_Controller()
         //console.log(allProd)
+        allProd_DB = await productModel.find()
+        console.log('desde la BD',allProd_DB)
     }catch(error)
     {
         console.log(error)
@@ -62,6 +65,12 @@ router.get('/', (req, res)=>{
 
 
 router.get('/:pid',async (req,res)=>{
+    await productModel.findOne({_id:{$eq:req.params.pid}})
+    .then(product=>{
+        if(!product)
+             return console.log('no hay nadie')
+        console.log('desde la BD un producto',product)
+    })
     res.status(allProd.status).send(await findProducts_Controller(req.params.pid))
 
 })
@@ -89,7 +98,18 @@ router.post('/',async(req,res)=>{
     
 })
 
-router.delete('/:pid',(req,res)=>{
+router.delete('/:pid',async (req,res)=>{
+    
+    //MONGO DB
+    await productModel.findById(req.params.pid,{title:1,price:1})
+    .then(data=>{
+        if(!data)
+            return console.log('no hay nada que borrar')
+        console.log('hay esto para borrar',data)
+        productModel.findByIdAndDelete(data._id)
+        .then(data=>console.log('Se elimino',data))
+    })
+    //FILESYSTEM
     prod.deleteProduct(allProd,req.params.pid)
     .then(data=>{
         console.log(data)
@@ -101,9 +121,22 @@ router.delete('/:pid',(req,res)=>{
 
   
 })
-router.put('/:pid',(req,res)=>{
+router.put('/:pid',async (req,res)=>{
     
     const {title, description, price, thumbnail, code, category, stock} = filterData_Controller(req.body)
+
+    //MONGO DB
+    await productModel.findByIdAndUpdate(req.params.pid,{title, description, price, thumbnail, code, category, stock})
+    .then(data=>{
+        if (!data)
+            return console.log('NO encontro nada para actualizaR')
+        console.log('se Actualizo',data)
+        productModel.findById(req.params.pid)
+        .then(data=>console.log('ACTUALIZADO',data))
+        
+    })
+
+    //FILESYSTEM
     prod.putProduct(allProd,req.params.pid,title, description, price, thumbnail, code, category, stock)
     .then(data=>{
         if (data?.messageError)

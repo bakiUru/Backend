@@ -6,16 +6,21 @@ socket.emit('message', ' Hola soy nuevo')
 //Carga de productos
 socket.on('loadProducts',data=>
     {
-        console.log(data)
         loadProducts(data)
     })
 
 
-socket.on('server:liveProduct',data=>{
-  console.log(data)
-  socket.emit('cliente:liveProduct', 'que es lo que queres')
+socket.on('liveProduct1', data=>{
+loadProducts(data)
+  
+})
+socket.on('liveProduct',data=>{
+  console.log('quemando todo',data)
 })
 socket.emit('cliente:liveProduct', 'que es lo que queres')
+
+
+
 //PRUEBA NOTIFICACION TOAST
 socket.on('connectUser', data =>{
     console.log(data)

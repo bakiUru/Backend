@@ -9,16 +9,21 @@ routerViews.get('/add',(req,res)=>{
 })
 routerViews.get('/',(req,res)=>{
     
-    socketServer.on('cliente:liveProduct',data=>{
-        console.log(data)
-    })
-    socketServer.sockets.emit('server:liveProduct','hola desde aca')
+    socketServer.emit('liveProduct','hola desde aca')
     reloadProducts_Controller()
     .then(data=>{
         console.log('voy a cargar')
         const products = data.data.reverse()
-        socketServer.emit('server:liveProduct',data.data)
-        res.render('products/realTime-products',{ products })
+        //EL ERROR ESTA EN QUE CUANDO RENDERIZAS PERDES EL CONSOL DESDE EL CLIENTE, LO ULTIMO QUE HACE ES RENDERIZAR EL DOM
+        //res.render('products/realTime-products',{ products })
+        socketServer.emit('liveProduct1',products=>{
+            res.render('products/realTime-products',{ products })
+        })
+
+            socketServer.on('cliente:liveProduct',data=>{
+                console.log(data)
+            })
+           
     }).catch(e=>{
         console.log(e) 
     })

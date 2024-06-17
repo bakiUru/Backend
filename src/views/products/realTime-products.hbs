@@ -1,16 +1,18 @@
 <h2>Estos son en tiempo real</h2>
+<div class="product_list" id="product_list">   
+      <!--LISTA DE PRODUCTOS--->
 {{#each products}}
 <div class="card m-3 row border-radius:10 style=width: 18rem;">
   <img src="..." class="card-img-top" alt="..." />
   <div class="card-body">
-    <h5 class="card-title">${{this.title}}</h5>
-    <p class="card-text">${{this.category}}</p>
+    <h5 class="card-title">{{this.title}}</h5>
+    <p class="card-text">{{this.category}}</p>
     <ul class="list-group list-group-flush text-center">
-      <li class="list-group-item">$ ${{this.price}}</li>
-      <li class="list-group-item">Unidades: ${{this.stock}}</li>
+      <li class="list-group-item">$ {{this.price}}</li>
+      <li class="list-group-item">Unidades: {{this.stock}}</li>
     </ul>
     <div class="card-footer p-1">
-      <p class="card-text">${{this.description}}</p>
+      <p class="card-text">{{this.description}}</p>
     </div>
     <a href="#" class="btn btn-primary m-2">Agregar</a>
     <a href="#" class="btn btn-primary m-2">Eliminar</a>
@@ -18,3 +20,4 @@
   </div>
 </div>
 {{/each}}
+</div>

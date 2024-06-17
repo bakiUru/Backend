@@ -1,4 +1,4 @@
-import file  from '../Data/fileManager.js'
+import file  from '../Data/fyleSystem/fileManager.js'
 
 class Product {
     constructor(title,description,price,thumbnail,code,category,stock)
