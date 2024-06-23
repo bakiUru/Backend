@@ -1,1 +1,1 @@
-[]
+[{"title":"Bolso","description":"esto es por post","price":2433,"thumbnail":"dasdas","code":"AASV","status":true,"category":"cosas Ricas","stock":132,"id":1},{"title":"Guantes","description":"esto es por post","price":24,"thumbnail":"dasdas","code":"AA321","status":true,"category":"cosas Ricas","stock":0,"id":2}]

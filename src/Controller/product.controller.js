@@ -44,14 +44,12 @@ const createProduct_Controller = async(...product)=>{
 const filterData_Controller = (data)=>{
     let {title, description, price, thumbnail, code, category, stock} = data
     try{
-
-
-        title=title.toString()
-        description=description.toString()
-        category=category.toString()
-        thumbnail=thumbnail.toString()
+        title=title?title.toString():undefined
+        description=description?description.toString():undefined
+        category=category?category.toString():undefined
+        thumbnail=thumbnail?thumbnail.toString():undefined
         //CONTROL SI PRICE O NUMBER SON MENORES A 0-9 --- Convertirlos a un arreglo y verificar cada posicion si es mayor o menor a 0-9 usar exresiones regulares
-        if(!Number.isInteger(price))
+        if(!Number.isInteger(price) && price !== undefined)
             {
                 price = price.split('')
                 price.forEach(element => {
@@ -60,7 +58,7 @@ const filterData_Controller = (data)=>{
             })
             price=Number.parseInt(price.join(''))
         }
-        if(!Number.isInteger(stock))
+        if(!Number.isInteger(stock) && stock !== undefined)
             {
                 stock = stock.split('')
                 stock.forEach(element => {
@@ -69,9 +67,8 @@ const filterData_Controller = (data)=>{
             })
             stock=Number.parseInt(stock.join(''))
         }
-    
-    
-        return {title, description, price, thumbnail, code, category, stock}
+        
+        return {title, description:description,price:price?price:undefined, thumbnail, code, category:category, stock:stock?stock:undefined}
     }catch(e){
         console.log(e.message)
         return {message:e.message,data:[],status:400}

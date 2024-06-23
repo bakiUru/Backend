@@ -1,8 +1,7 @@
 import  express  from 'express'
 import path  from 'path'
 //Conexion Mongo
-import mongoose from 'mongoose'
-import {connectDB} from './Data/MongoDB/connect.js'
+import {connectRetryDB} from './Data/MongoDB/connect.js'
 
 //SOCKET
 import {Server} from 'socket.io'
@@ -23,15 +22,11 @@ import { reloadProducts_Controller } from './Controller/product.controller.js'
 const app = express()
 const PORT = process.env.PORT || 3000
 //conexion a la BD
-connectDB(process.env.MONGO_URI,process.env.MONGO_DB)
+connectRetryDB()
 
 const httpServer  =  app.listen(PORT, ()=>{
         console.log(`Server escuchando en el puerto ${PORT}`)
     })
-
-
-
-
 
 export const socketServer = new Server(httpServer)
 
@@ -73,16 +68,11 @@ socketServer.on('connection',async (socket) => {
     reloadProducts_Controller()
     .then(data=>{
         socket.emit('loadProducts',data.data)
-      
-        
     }).catch(e=>{
         console.log(e) 
     })
     console.log('New client connected',socket.id);
-    
-    
     socket.emit('liveProduct','sorete')
-    
     socket.broadcast.emit('connectUser',socket.id)
     socket.on('message', data =>{
         console.log(data)

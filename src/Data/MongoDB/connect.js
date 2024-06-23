@@ -1,15 +1,39 @@
 import {connect} from 'mongoose'
 import { firstSeed } from './firstSeed.js'
+import 'dotenv/config'
+const MAX_ATTEMPTS = 3;
+const TIMEOUT = 5000;
 
-export const connectDB = async (MONGO_URI,MONGO_DB) => {  
-    try{
-        await connect(MONGO_URI,{dbName:MONGO_DB})
-        console.log('Connected to MongoDB')
-        firstSeed()
-    }
-    catch(error){
-        console.log(error)
-    }
 
+export const connectDB = async () => {  
+    await connect(process.env.MONGO_URI,{dbName:process.env.MONGO_DB})
+    .then(db=>{
+        db.connection.listCollections().then(
+            collections => collections.map(collection=>console.log(collection.name))
+        )
+    }).catch(e=>console.log(e))
+    console.log('Connected to MongoDB')
+    console.log('Collections Name:')
+   // firstSeed()
+    
 }
 
+//Funcion de reconexion de BD
+export const connectRetryDB = async ()=>{
+    //inicializo los intentos de conexion
+    let attempts = 0
+    while (attempts< MAX_ATTEMPTS){
+        try{
+            await connectDB()
+            return 
+        }
+        catch (e){
+            //voy incrementando los intentos del centinela del while 
+            attempts ++
+            console.log(`Failed to connect to MongoDB attempt: ${attempts}. Retrying in ${TIMEOUT/1000}s...`);
+            await new Promise (resolve => setTimeout(resolve,TIMEOUT));
+            if (MAX_ATTEMPTS == attempts)
+                console.log('Failed to connect to MongoDB after max attempts');
+        }
+    }
+}

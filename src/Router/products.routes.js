@@ -3,6 +3,7 @@ import { reloadProducts_Controller, findProducts_Controller, createProduct_Contr
 import ProductManager from '../Utils/productManager.js'
 import { socketServer } from '../app.js'
 import productModel from '../Data/MongoDB/Models/product.models.js'
+import { getOneProduct, getProducts, newProduct, delProductDB,putProductDB } from '../Data/MongoDB/product.dao.js'
 
 const router = express.Router()
 const prod = new ProductManager()
@@ -11,23 +12,29 @@ let allProd, allProd_DB
 
 //Obtenemos los Productos Middleware
 router.get('/',async (req,res,next)=>{
-    //prueba
+    const {limit,page,asc,query} = req.query
     socketServer.on('cliente:liveProduct', data=>console.log(data))
     try{
+        //FYLESYSTEM
         allProd = await reloadProducts_Controller()
         //console.log(allProd)
-        allProd_DB = await productModel.find()
-        console.log('desde la BD',allProd_DB)
+
+        //MONGODB
+        allProd_DB = await getProducts(limit,page,asc,query)
+        
     }catch(error)
     {
         console.log(error)
     }
     next()
 })
+
+
 //Obtenemos el Producto x ID
 router.get('/:pid',async(req,res,next)=>{
     try{
         allProd = await reloadProducts_Controller()
+        getOneProduct
         //console.log(allProd)
     }catch(error)
     {
@@ -59,19 +66,44 @@ router.put('/:pid',async(req,res,next)=>{
 
 
 router.get('/', (req, res)=>{
-    res.status(allProd.status).send(allProd)
+    //MONGODB
+
+    allProd_DB.totalDocs>0?
+    res.status(200).json({
+        status:'succes',
+        payload:allProd_DB.docs,
+        totalPages: allProd_DB.totalPages,
+        page: allProd_DB.page,
+        pagingCounter: allProd_DB.pagingCounter,
+        hasPrevPage: allProd_DB.hasPrevPage,
+        hasNextPage: allProd_DB.hasNextPage,
+        prevLink: allProd_DB.prevPage,
+        nextLink: allProd_DB.nextPage
+    })
+    :
+    res.status(404).json({status:'error',payload:[],message:"No hay productos"})
+
+    //FYLESYSTEM
+    //res.status(allProd.status).send(allProd)
     
 })
 
 
 router.get('/:pid',async (req,res)=>{
-    await productModel.findOne({_id:{$eq:req.params.pid}})
-    .then(product=>{
-        if(!product)
-             return console.log('no hay nadie')
-        console.log('desde la BD un producto',product)
-    })
-    res.status(allProd.status).send(await findProducts_Controller(req.params.pid))
+    const {pid} = req.params
+
+    const product = await getOneProduct(pid)
+    if(!product)
+        return res.status(404).json({status:'error',message:"No Encontramos el Producto",payload:[]})
+    return res.status(200).json({success:'success',message:'Producto Encontrado',payload: product })
+    /*await productModel.findOne({_id:{$eq:pid}})
+        .then(product=>{
+            if(!product)
+                return console.log('no hay nadie')
+            console.log('desde la BD un producto',product)
+        })
+    res.status(allProd.status).send(await findProducts_Controller(pid))
+    */
 
 })
 
@@ -86,14 +118,24 @@ router.post('/',async(req,res)=>{
         code, 
         category, 
         stock} = filterData_Controller(req.body)
-        
+        //MONGO DB
+        const newProductDB = await newProduct(title, description, price, thumbnail, code, category, stock)
+        //const newProductDB = await productModel.create({title, description, price, thumbnail, code, category, stock,status:(stock>0)? true : false })
+        console.log(newProductDB)
+        if(!newProductDB)
+            return res.status(400).json({status:'ERROR',message:"No se pudo crear el Producto",payload:[]})
+        return res.status(200).json({status:'success',message:"Se ha creado el Producto",payload:newProductDB})
+
+
+        //FILESYSTEM
+        /*
         let newProduct = await createProduct_Controller(title, description, price, thumbnail, code, category, stock)
         console.log('Lo que devuelvo',newProduct)
         if(newProduct.status==201)
             res.render('products/new-product',newProduct.data)
         else
             res.status(newProduct.status).send(newProduct.data)
-
+        */
 
     
 })
@@ -101,15 +143,15 @@ router.post('/',async(req,res)=>{
 router.delete('/:pid',async (req,res)=>{
     
     //MONGO DB
-    await productModel.findById(req.params.pid,{title:1,price:1})
-    .then(data=>{
-        if(!data)
-            return console.log('no hay nada que borrar')
-        console.log('hay esto para borrar',data)
-        productModel.findByIdAndDelete(data._id)
-        .then(data=>console.log('Se elimino',data))
-    })
+    const {pid} = req.params
+    const deletedProduct = await delProductDB(pid)
+    console.log('DELETE ROUTES',deletedProduct)
+    if(!deletedProduct)
+        return res.status(400).json({status:'ERROR',message:"No se pudo Borrar el Producto",payload:[]})
+    return res.status(200).json({status:'success',message:"Se ha Borrado el Producto",payload:deletedProduct})
+    
     //FILESYSTEM
+    /*
     prod.deleteProduct(allProd,req.params.pid)
     .then(data=>{
         console.log(data)
@@ -118,24 +160,21 @@ router.delete('/:pid',async (req,res)=>{
         else
             res.status(data.status).send(data.messageError)
     })
-
+    */
   
 })
+
+
 router.put('/:pid',async (req,res)=>{
-    
+    const {pid} = req.params
     const {title, description, price, thumbnail, code, category, stock} = filterData_Controller(req.body)
-
     //MONGO DB
-    await productModel.findByIdAndUpdate(req.params.pid,{title, description, price, thumbnail, code, category, stock})
-    .then(data=>{
-        if (!data)
-            return console.log('NO encontro nada para actualizaR')
-        console.log('se Actualizo',data)
-        productModel.findById(req.params.pid)
-        .then(data=>console.log('ACTUALIZADO',data))
-        
-    })
-
+    const modProdcut = await putProductDB(pid,title, description, price, thumbnail, code, category, stock)
+    console.log('MOD ROUTES',modProdcut)
+    if(!modProdcut)
+        return res.status(400).json({status:'ERROR',message:"No se pudo Modificar el Producto",payload:[]})
+    return res.status(200).json({status:'success',message:"Se ha Modificado el Producto",payload:modProdcut})
+/*
     //FILESYSTEM
     prod.putProduct(allProd,req.params.pid,title, description, price, thumbnail, code, category, stock)
     .then(data=>{
@@ -144,7 +183,7 @@ router.put('/:pid',async (req,res)=>{
         else
             res.send(data)
     })
-
+    */
 })
 
 

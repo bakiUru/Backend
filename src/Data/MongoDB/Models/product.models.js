@@ -1,4 +1,8 @@
 import { Schema,model } from "mongoose";
+import mogoosePaginate  from "mongoose-paginate-v2";
+
+//declaro el nombre de la coleccion 
+const productsCollection = 'products'
 
 const ProductSchema = new Schema ({
     title: {
@@ -34,6 +38,7 @@ const ProductSchema = new Schema ({
         min: 0
 }
 }, {timestamps: true})
-const productModel = model('products',ProductSchema)
+ProductSchema.plugin(mogoosePaginate)
+const productModel = model(productsCollection,ProductSchema)
 
 export default productModel
