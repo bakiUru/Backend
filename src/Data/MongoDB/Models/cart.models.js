@@ -14,7 +14,11 @@ const CartSchema = new Schema ({
             },
             quantity: Number}]
     }
-},{timestamps:true})
+},
+{timestamps:true})
+CartSchema.pre('find', ()=>{
+    this.populate('products.products')
+})
 
 const cartModel = model(cartCollection,CartSchema)
 export default cartModel;

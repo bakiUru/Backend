@@ -1,21 +1,23 @@
 import express  from 'express'
-import { reloadProducts_Controller, findProducts_Controller, createProduct_Controller, filterData_Controller } from '../Controller/product.controller.js'
+import { reloadProducts_Controller, filterData_Controller } from '../Controller/product.controller.js'
 import ProductManager from '../Utils/productManager.js'
 import { socketServer } from '../app.js'
-import productModel from '../Data/MongoDB/Models/product.models.js'
 import { getOneProduct, getProducts, newProduct, delProductDB,putProductDB } from '../Data/MongoDB/product.dao.js'
-
+import { validToken } from '../middleware/tokenVerify.meddleware.js'
+import { User_AuthError } from "../Utils/Error/errorHandle.js"
 const router = express.Router()
 const prod = new ProductManager()
 let allProd, allProd_DB
 
-
+//MIDDLEWARE
 //Obtenemos los Productos Middleware
-router.get('/',async (req,res,next)=>{
+router.get('/',validToken, async (req,res,next)=>{
     const {limit,page,asc,query} = req.query
+    console.log(req.user)
     socketServer.on('cliente:liveProduct', data=>console.log(data))
     try{
         //FYLESYSTEM
+
         allProd = await reloadProducts_Controller()
         //console.log(allProd)
 
@@ -43,15 +45,24 @@ router.get('/:pid',async(req,res,next)=>{
     next();
 })
 
-router.delete('/:pid',async(req,res,next)=>{
+//PRUEBA DE BORRAR UN PRODUCTO CON ROL DE USAURIO
+router.delete('/:pid',validToken,async(req,res,next)=>{
+    const {role} = req.user
+    console.log(role)
+    if(role=='user')
+    {
+        console.log('estoy como usuario')
+        const {error,message,status} = new User_AuthError('No tienes Persmisos de Administador')
+        return res.status(status).json({message:error + message})
+    }
     try{
         allProd = await reloadProducts_Controller()
-        //console.log(allProd)
+        next()
     }catch(error)
     {
         console.log(error)
     }
-    next();
+    
 })
 router.put('/:pid',async(req,res,next)=>{
     try{
@@ -64,7 +75,7 @@ router.put('/:pid',async(req,res,next)=>{
     next();
 })
 
-
+///////////////////////////////////////////////
 router.get('/', (req, res)=>{
     //MONGODB
 

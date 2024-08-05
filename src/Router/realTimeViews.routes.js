@@ -23,7 +23,7 @@ routerViews.get('/',(req,res)=>{
             socketServer.on('cliente:liveProduct',data=>{
                 console.log(data)
             })
-           
+    
     }).catch(e=>{
         console.log(e) 
     })

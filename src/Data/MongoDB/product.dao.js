@@ -25,7 +25,7 @@ const getProducts = async (limit,page,asc,query)=>{
 
 const getOneProduct = async (id) =>{
     try{
-        return await productModel.findById(id)
+        return await productModel.findById(id).populate('products.products')
     }catch(e)
     {
         console.log('MANEJO DE ERROR -- buscador de Producto POR ID\n',e)
