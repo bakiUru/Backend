@@ -1,0 +1,87 @@
+<div class="container p-3">
+<div class="col-md-20 mx-auto">
+  <h1 class="display-6">Crear Producto</h1>
+  <div class="card text-center">
+    <div class="card header">
+      <form 
+class="row g-3 needs-validation p-5" 
+novalidate
+method="POST"
+action="/api/products"
+>
+  <div class="col-md-4">
+    <label for="productTitle" class="form-label">Titulo</label>
+    <input type="text" class="form-control" name="title" placeholder="Titulo" required>
+    <div class="invalid-feedback">
+      Dato Necesario
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="productDescription" class="form-label">Descripcion</label>
+    <input type="text" class="form-control" name="description" placeholder="Descripcion" required>
+    <div class="invalid-feedback">
+      Dato Necesario
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="productCode" class="form-label">Codigo</label>
+    <div class="input-group has-validation">
+      <input type="text" class="form-control" name="code" aria-describedby="inputGroupPrepend" placeholder="Codigo" required>
+      <div class="invalid-feedback">
+        Dato Necesario
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="col-md-6">
+    <label for="productPrice" class="form-label">Precio</label>
+    <div class="input-group has-validation">
+
+    <span class="input-group-text" id="inputGroupPrepend">$</span>
+    <input type="text" class="form-control" name="price"  placeholder="0.0" required>
+    <div class="invalid-feedback">
+      Ingrese Precio
+    </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <label for="productCategory" class="form-label">Categoria</label>
+    <select class="form-select" name="category" required>
+      <option selected disabled value="">---------</option>
+      <option>Alimentos</option>
+      <option>Hogar</option>
+      <option>Electronica</option>
+      <option>TV/Audio</option>
+      <option>Otros</option>
+    </select>
+    <div class="invalid-feedback">
+      Seleccione una Opcion
+    </div>
+  </div>
+  <div class="col-md-3">
+    <label for="productStock" class="form-label">Stock</label>
+    <input type="text" class="form-control" name="stock" placeholder="0" required>
+    <div class="invalid-feedback">
+      Stock Necesario
+    </div>
+  </div>
+  <div class="col-12 p-3">
+
+
+  <label class="input-group-text" for="inputGroupFile01">Imagen</label>
+  <input type="file" class="form-control" name="thumbnail" value="no-img">
+
+
+</div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Crear Producto</button>
+  </div>
+</form>
+    </div>
+  </div>
+</div>
+
+
+</div>
