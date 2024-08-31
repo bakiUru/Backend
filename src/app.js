@@ -67,10 +67,13 @@ app.engine('hbs', handlebars.engine({
 
 app.use(session({
     secret: envs.SECRET_CODE,
+    name:'sessionApi',
     resave: true,
     saveUninitialized: true,
-    cookie: {secure:true}
+    //No colocamos secure en coookie debido a que es un entorno local //secure:true
+    cookie: { },
 }))
+
 //PASSPORT
 initializePassport()
 app.use(passport.initialize())

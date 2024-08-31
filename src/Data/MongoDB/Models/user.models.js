@@ -31,11 +31,9 @@ const UserSchema = new Schema ({
         require: true
     },
     cart:{
-        type:{
             type: Schema.Types.ObjectId,
             ref: cartModel.modelName
         },
-    },
     role:{
         type: String,
         enum: ['admin', 'user'],
@@ -50,8 +48,9 @@ DECIDI BUSCAR EN MONGODB COMO ENCRIPTAR DE FORMA CORRECTA PARA EVITAR PROBLEMAS 
 FUE LA UNICA FORMA QUE ENCONTRE DE PODER SOLUCIONARLO, EL CODIGO ES COPIADO DE LA PAGINA
 
 */
-UserSchema.pre('create', (next) =>{
-    var user = this;
+
+UserSchema.pre('create', async(next) =>{
+    let user = this;
 // solo se hashara si es modificado o nuevo
 if (!user.isModified('password')) return next();
 
@@ -67,12 +66,12 @@ bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt)=> {
 
 
 });
-
 UserSchema.plugin(mogoosePaginate)
 //para que muestre los detalles
 /*
 UserSchema.pre('findOne',()=>{
-    this.populate('cart')
+    this.populate('cart.cart')
 })*/
 const userModel = model(userCollection,UserSchema)
+
 export default userModel

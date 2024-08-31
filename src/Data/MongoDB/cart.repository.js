@@ -2,20 +2,20 @@ import cartModel from "./Models/cart.models.js"
 import productModel from "./Models/product.models.js"
 
 //Verificar antes la existencia del producto en la BD y del carro
-const addProductCart = async (id,pid)=>{
+const addProductCart = async (id,pid,quantity = 1)=>{
     try {
         const cart = await findCart(id)
         console.log('CARRO',cart)
             if(!cart)
                 return null
-            const productCart = await cartModel.findOneAndUpdate({_id:id, "products.product":pid},{$inc:{"products.$.quantity":1}},{new:true})
+            const productCart = await cartModel.findOneAndUpdate({_id:id, "products.product":pid},{$inc:{"products.$.quantity":quantity}},{new:true})
             console.log(productCart)
             if(productCart)
                 console.log(`esta en el carro incremento la cantidad ${productCart.products[0].quantity}`)
             if(!productCart)
                 {
                     console.log(`No esta en el carro lo Agrego al producto ID: ${pid}`)
-                    return  cartModel.updateOne({ _id: {$eq:id}}, { $push: { products: {product: pid , quantity: 1 }}},{ new: true })
+                    return  cartModel.updateOne({ _id: {$eq:id}}, { $push: { products: {product: pid , quantity: quantity }}},{ new: true })
                 }
             return productCart                 
     }catch(e){
@@ -26,7 +26,7 @@ const addProductCart = async (id,pid)=>{
 
 const getCartProduct = async (id)=>{
     try {
-        const cart = await cartModel.findById(id)
+        const cart = await findCart(id)
         if(!cart)
             return null
         return cart.products
@@ -75,6 +75,21 @@ const emptyCart= async (id)=>{
 
 }
 
+const updateCart = async (id,products)=>{
+    try{
+        const cart = await findCart(id)
+        if(!cart)
+            return null
+        console.log('esto me llega',products)
+        const productCart = await cartModel.updateOne({ _id: {$eq:id}}, { $set: {products}},{ new: true })
+        console.log(productCart)
+        return {message: 'Se modifico el Carro ', products: products}
+}catch(error)
+{
+    console.log(error)
+    return null
+}
+}
 const delCart = async (id) =>{
     try {
         const cart = await findCart(id)
@@ -142,12 +157,13 @@ const updateQuantityCart =async (id,pid,quantity)=>{
 }
 
 
-export {
+export default {
     addProductCart,
     cartCreate,
     delProductCart,
     getCartProduct,
     emptyCart,
     delCart,
+    updateCart,
     updateQuantityCart
 }

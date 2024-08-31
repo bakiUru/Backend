@@ -1,26 +1,28 @@
 import express  from 'express'
-import { reloadProducts_Controller, filterData_Controller } from '../Controller/product.controller.js'
+import { reloadProducts_Controller, getAllProducts,getOneProduct, addProduct, updateProduct, deleteProduct } from '../Controller/product.controller.js'
 import ProductManager from '../Utils/productManager.js'
 import { socketServer } from '../app.js'
-import { getOneProduct, getProducts, newProduct, delProductDB,putProductDB } from '../Data/MongoDB/product.dao.js'
 import { validToken } from '../middleware/tokenVerify.meddleware.js'
 import { User_AuthError } from "../Utils/Error/errorHandle.js"
+import { authPolicies } from '../middleware/auth.middleware.js'
+import { POLICIES } from '../Config/handlePolicies.config.js'
 const router = express.Router()
 const prod = new ProductManager()
 let allProd, allProd_DB
 
 //MIDDLEWARE
 //Obtenemos los Productos Middleware
-router.get('/',validToken, async (req,res,next)=>{
+/*
+router.use('/',validToken, async (req,res,next)=>{
     const {limit,page,asc,query} = req.query
     console.log(req.user)
     socketServer.on('cliente:liveProduct', data=>console.log(data))
     try{
         //FYLESYSTEM
-
+        
         allProd = await reloadProducts_Controller()
-        //console.log(allProd)
-
+        console.log(allProd)
+        
         //MONGODB
         allProd_DB = await getProducts(limit,page,asc,query)
         
@@ -29,7 +31,7 @@ router.get('/',validToken, async (req,res,next)=>{
         console.log(error)
     }
     next()
-})
+})*/
 
 
 //Obtenemos el Producto x ID
@@ -46,7 +48,7 @@ router.get('/:pid',async(req,res,next)=>{
 })
 
 //PRUEBA DE BORRAR UN PRODUCTO CON ROL DE USAURIO
-router.delete('/:pid',validToken,async(req,res,next)=>{
+router.delete('/:pid',validToken,authPolicies(POLICIES.ADMIN),async(req,res,next)=>{
     const {role} = req.user
     console.log(role)
     if(role=='user')
@@ -64,7 +66,8 @@ router.delete('/:pid',validToken,async(req,res,next)=>{
     }
     
 })
-router.put('/:pid',async(req,res,next)=>{
+/*
+router.put('/:pid',validToken,authPolicies(POLICIES.ADMIN),async(req,res,next)=>{
     try{
         allProd = await reloadProducts_Controller()
         //console.log(allProd)
@@ -74,93 +77,32 @@ router.put('/:pid',async(req,res,next)=>{
     }
     next();
 })
-
+*/
 ///////////////////////////////////////////////
-router.get('/', (req, res)=>{
-    //MONGODB
-
-    allProd_DB.totalDocs>0?
-    res.status(200).json({
-        status:'succes',
-        payload:allProd_DB.docs,
-        totalPages: allProd_DB.totalPages,
-        page: allProd_DB.page,
-        pagingCounter: allProd_DB.pagingCounter,
-        hasPrevPage: allProd_DB.hasPrevPage,
-        hasNextPage: allProd_DB.hasNextPage,
-        prevLink: allProd_DB.prevPage,
-        nextLink: allProd_DB.nextPage
-    })
-    :
-    res.status(404).json({status:'error',payload:[],message:"No hay productos"})
-
+router.get('/', getAllProducts
     //FYLESYSTEM
     //res.status(allProd.status).send(allProd)
-    
-})
+    )
 
 
-router.get('/:pid',async (req,res)=>{
-    const {pid} = req.params
+router.get('/:pid',getOneProduct)
 
-    const product = await getOneProduct(pid)
-    if(!product)
-        return res.status(404).json({status:'error',message:"No Encontramos el Producto",payload:[]})
-    return res.status(200).json({success:'success',message:'Producto Encontrado',payload: product })
-    /*await productModel.findOne({_id:{$eq:pid}})
-        .then(product=>{
-            if(!product)
-                return console.log('no hay nadie')
-            console.log('desde la BD un producto',product)
-        })
-    res.status(allProd.status).send(await findProducts_Controller(pid))
+
+router.post('/',validToken,authPolicies(POLICIES.ADMIN),addProduct
+
+
+    //FILESYSTEM
+    /*
+    let newProduct = await createProduct_Controller(title, description, price, thumbnail, code, category, stock)
+    console.log('Lo que devuelvo',newProduct)
+    if(newProduct.status==201)
+        res.render('products/new-product',newProduct.data)
+    else
+        res.status(newProduct.status).send(newProduct.data)
     */
+)
 
-})
-
-
-router.post('/',async(req,res)=>{
-    //Prueba de Ingreso // TODO ERRORES
-    console.log('lo que recibo del FORM',req.body)
-    const {title, 
-        description, 
-        price, 
-        thumbnail, 
-        code, 
-        category, 
-        stock} = filterData_Controller(req.body)
-        //MONGO DB
-        const newProductDB = await newProduct(title, description, price, thumbnail, code, category, stock)
-        //const newProductDB = await productModel.create({title, description, price, thumbnail, code, category, stock,status:(stock>0)? true : false })
-        console.log(newProductDB)
-        if(!newProductDB)
-            return res.status(400).json({status:'ERROR',message:"No se pudo crear el Producto",payload:[]})
-        return res.status(200).json({status:'success',message:"Se ha creado el Producto",payload:newProductDB})
-
-
-        //FILESYSTEM
-        /*
-        let newProduct = await createProduct_Controller(title, description, price, thumbnail, code, category, stock)
-        console.log('Lo que devuelvo',newProduct)
-        if(newProduct.status==201)
-            res.render('products/new-product',newProduct.data)
-        else
-            res.status(newProduct.status).send(newProduct.data)
-        */
-
-    
-})
-
-router.delete('/:pid',async (req,res)=>{
-    
-    //MONGO DB
-    const {pid} = req.params
-    const deletedProduct = await delProductDB(pid)
-    console.log('DELETE ROUTES',deletedProduct)
-    if(!deletedProduct)
-        return res.status(400).json({status:'ERROR',message:"No se pudo Borrar el Producto",payload:[]})
-    return res.status(200).json({status:'success',message:"Se ha Borrado el Producto",payload:deletedProduct})
-    
+router.delete('/:pid',validToken,authPolicies(POLICIES.ADMIN),deleteProduct
     //FILESYSTEM
     /*
     prod.deleteProduct(allProd,req.params.pid)
@@ -173,18 +115,10 @@ router.delete('/:pid',async (req,res)=>{
     })
     */
   
-})
+)
 
 
-router.put('/:pid',async (req,res)=>{
-    const {pid} = req.params
-    const {title, description, price, thumbnail, code, category, stock} = filterData_Controller(req.body)
-    //MONGO DB
-    const modProdcut = await putProductDB(pid,title, description, price, thumbnail, code, category, stock)
-    console.log('MOD ROUTES',modProdcut)
-    if(!modProdcut)
-        return res.status(400).json({status:'ERROR',message:"No se pudo Modificar el Producto",payload:[]})
-    return res.status(200).json({status:'success',message:"Se ha Modificado el Producto",payload:modProdcut})
+router.put('/:pid',validToken,authPolicies(POLICIES.ADMIN),updateProduct
 /*
     //FILESYSTEM
     prod.putProduct(allProd,req.params.pid,title, description, price, thumbnail, code, category, stock)
@@ -195,7 +129,7 @@ router.put('/:pid',async (req,res)=>{
             res.send(data)
     })
     */
-})
+)
 
 
 

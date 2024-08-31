@@ -14,10 +14,12 @@ export const User_AuthError = ErrorFactory('AuthentificationError',401)//401
 export const User_NotFoundError = ErrorFactory('NotFoundError',403)//403 -- Sin autorizacion Forbidden
 export const User_NullValueError = ErrorFactory('EmptyValuesError',400)
 export const User_LengthError = ErrorFactory('ValueLengthError')//
+export const User_EmailNotValid = ErrorFactory('EmailNotValid',401)
 
 //TOKEN
 export const Token_NotProvider = ErrorFactory('Token_Error',401)
 export const Token_Invalid = ErrorFactory('Token_Error',401)
+export const Token_Empty = ErrorFactory('Token_Empty',403)
 
 //COOKIES
 export const Cookie_NotFound = ErrorFactory('Cookie_Error',401)

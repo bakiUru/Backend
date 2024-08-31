@@ -2,7 +2,8 @@ import passport from "passport";
 import { Strategy as CustomStrategy } from "passport-custom";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { getUserEmail,getOneUser, newUserDB } from "../Data/MongoDB/user.dao.js";
+import { getUserEmail,getOneUser, newUserDB } from "../Controller/user.controller.js";
+import userRepository from "../Data/MongoDB/user.repository.js";
 import { hashPassword,isValidPassword } from "../Utils/hashPass.js";
 import envs from "./env.config.js";
 import { cookieExtractor } from "../Utils/cookieExtractor.js";
@@ -23,7 +24,7 @@ passport.use('googleRegister',
                 const {id,name,emails} = profile
                 const email = emails[0].value
                 console.log(email)
-                const user = await getUserEmail(email)
+                const user = await getUserEmail(req)
                 if(!user)
                     {
                         const newUser = 
@@ -53,16 +54,16 @@ passport.use('googleRegister',
             console.log('----PASSPORT REGISTER----')
             try{
                 console.log(req.body.first_name)
-                console.log(username)
+                console.log('----',username)
                 req.body.password = await hashPassword(password)
 
-                const user = await getUserEmail(username);
+                const user = await getUserEmail(req);
                 console.log(req.body.password)
                 //Controlamos la respuesta de la Busqueda 
                 if(!user)
                 {
                     console.log('crea uno nuevoo')
-                    const newAdd = await newUserDB(req.body)
+                    const newAdd = await userRepository.newUserDB(req.body)
                     return done(null, newAdd);
                 }
                 console.log('ya hay usuario')
@@ -83,7 +84,8 @@ passport.use('googleRegister',
                    
                     console.log('este es el email',username)
                     console.log('este es la pass',password)
-                    const user = await getUserEmail(username);
+                    const user = await getUserEmail(req);
+                    
                     if(!user)
                         return done(null,false,{message:'User not exist'})
                     if(await !isValidPassword(password,user.password))
@@ -107,7 +109,7 @@ passport.use('googleRegister',
                     if(!tokenDecoded)
                         return done(null,false,{message: 'Problemas con el Token'})
                         
-                    const user = await getUserEmail(tokenDecoded.email)
+                    const user = await userRepository.getUserEmail(tokenDecoded.email)
                     console.log('Custom Passport',token)
                     console.log(tokenDecoded)
                     return done(null,tokenDecoded);
@@ -122,11 +124,9 @@ passport.use('googleRegister',
         passport.serializeUser((user,done)=>{
            done(null,user._id)
            })
-       
-                                   
            passport.deserializeUser(async (id,done)=>{
             try {
-                const user = await getOneUser(id)
+                const user = await userRepository.getOneUser(id)
                 console.log(user)
                 done(null,user)
                 
@@ -134,7 +134,7 @@ passport.use('googleRegister',
                 console.log(error)
                 done(error)
             }
-               })
+        })
     }
     
 

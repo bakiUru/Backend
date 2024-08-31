@@ -1,5 +1,5 @@
 import {connect} from 'mongoose'
-import { firstSeed } from './firstSeed.js'
+import { firstSeed } from './seed/firstSeed.js'
 import envs from '../../Config/env.config.js';
 import 'dotenv/config'
 const MAX_ATTEMPTS = 3;

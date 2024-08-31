@@ -1,22 +1,11 @@
+import cartModel from "./Models/cart.models.js"
 import userModel from "./Models/user.models.js"
-import { hashPassword } from "../../Utils/hashPass.js"
 
-const getUsers = async (limit,page,query,asc)=>{
-    let filter = query
-    if (query!==undefined)
-        {
-            filter =  query.split('=')
-            console.log(filter)
-            //del array que me da el split, lo convierto a un Objeto con su key
-            filter = Object.fromEntries([filter])
-        }
+const getUsers = async (query,option)=>{
     try{
         //MONGODB
-        //si recibo asc 
-        return asc!==undefined?
-            await userModel.paginate(filter,{limit:limit?limit:10,page:page?page:1})
-        :
-            await userModel.paginate(filter,{limit:limit?limit:10,page:page?page:1})
+        return await userModel.paginate(query,option)
+    
     }catch(e)
     {
         console.log('MANEJO DE ERROR -- Buscador de todos los User\n',e)
@@ -38,7 +27,7 @@ const getUserEmail = async (email) =>{
         return await userModel.findOne({email:email})
     }catch(e)
     {
-        console.log('MANEJO DE ERROR -- buscador de User POR ID\n',e)
+        console.log('MANEJO DE ERROR -- buscador de User POR EMAIL\n',e)
         return null
     }
 }
@@ -51,10 +40,13 @@ const newUserDB = async (data)=>{
         password,
         role} = data
     try{
+        const cart = await cartModel.create({})
+        console.log(cart)
         const newUser = await  userModel.create({first_name,
             last_name,
             email,
             age,
+            cart: cart._id,
             password,//: hashPass,
             role})
         return newUser
@@ -80,7 +72,7 @@ const delUserDB = async (id)=>{
     }
 }
 
-const putUserDB = async (data) =>{
+const putUserDB = async (id,data) =>{
     console.log('lo que recibo para modificar',data)
     try{
         return await userModel.findByIdAndUpdate(id,
@@ -108,7 +100,7 @@ const putUserDB = async (data) =>{
      
 }
 
-export {
+export default {
     getUsers,
     getOneUser,
     getUserEmail,

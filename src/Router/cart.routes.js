@@ -1,75 +1,43 @@
-import express  from 'express'
-import Cart from '../Utils/cartManager.js'
-import Product from '../Utils/productManager.js'
-import productModel from '../Data/MongoDB/Models/product.models.js'
-import {addProductCart,getCartProduct,cartCreate, delCart, delProductCart, emptyCart,updateQuantityCart} from '../Data/MongoDB/cart.dao.js'
+import {Router}  from 'express'
+//FYLESYSTEM
+//import Cart from '../Utils/cartManager.js'
+//import Product from '../Utils/productManager.js'
+import {createCart,addProductCart,getCart,deleteProductCart,deleteCart,emptyCart,updateQuantityCart,purchaseController} from '../Controller/cart.controller.js'
+import { authPolicies } from '../middleware/auth.middleware.js'
+import { POLICIES } from '../Config/handlePolicies.config.js'
 
 
-const routerCart =express.Router()
+
+const routerCart = Router()
 //Clases para el USO DEL MODO FILESYSTEM 
+/*
 const cart = new Cart()
 const prod = new Product()
 let prodInCart = {}
+*/
 //AL ENTRAR AL CARRO GENERA EL OBJETO CART
+/*
 routerCart.get('/', async(req,res,next)=>{
     //Creo el cart
+    //FILE SYSTEM
+    /*
     const newCart = await cartCreate()
     console.log(newCart)
     cart.storeCart()
-    next()
+    next() 
 })
+*/
 
-routerCart.get('/', (req,res)=>{
-//cart.addItem({id: 3,nombre: 'La Gran', apellido:'Muñeca'})
-res.send('estamos en el cart')
-})
+routerCart.get('/createCart',authPolicies(POLICIES.USER), createCart)
 
-//MIDLEWARE TODOS LOS PROUCTOS EN EL CARRO  
-routerCart.get('/:cid', async(req,res,next)=>{
-    const cid = req.params.cid
-    prodInCart = await getCartProduct(cid)
-    /*
-    if(cart.getCart(req.params.cid)==undefined)
-        cart.storeCart()
-    */
-    if(prodInCart)
-        next()
-    else
-        res.status(404).json({message:'No existe tal carrito'})
-})
 
 //TODOS LOS PRODUCTOS DEL CARRO
-routerCart.get('/:cid',(req,res)=>{
-    console.log(prodInCart)
-    res.status(200).json({message:'Todos los productos del Carro', payload: prodInCart})
-    /*
-    console.log(cart.getItem(req.params.cid))
-    res.send('estamos buscando el id en el carro')
-    */
-})
-routerCart.post('/:cid/products/:pid', (req,res,next)=>{
-    if(cart.getCart(req.params.cid)==undefined)
-        cart.storeCart()
-    next()
-})
+routerCart.get('/:cid',authPolicies(POLICIES.USER),getCart)
 
 //AGREGAR UN PRODUCTO AL CARRO, O AUMENTAR SU CANTIDAD
-routerCart.post('/:cid/products/:pid',async (req,res)=>{
-        const {cid,pid} = req.params
-        //MONGODB
-        productModel.findById(pid)
-        .then(data=>{
-            if(!data)
-                return res.status(404).json({status: 'ERROR', message: 'Producto no encontrado'})
-            addProductCart(cid,pid)
-            .then(cart=>{
-                if(!cart)
-                    return res.status(404).json({status: 'ERROR', message: 'Carro no encontrado'})
-                return res.status(200).json({status: 'success', message: 'Producto agregado al carro', cart})
-            })
-        })
+routerCart.post('/:cid/products/:pid',authPolicies(POLICIES.USER), addProductCart
         /*
-        ///DE MANERA LOCAL
+        ///FyleSystem
         //const prodFind = prod.getProductsbyID(pid)
         const cartFind = cart.getCart(cid) 
         if (cartFind.length > 0 || cartFind == cid)
@@ -86,76 +54,28 @@ routerCart.post('/:cid/products/:pid',async (req,res)=>{
                         }
                     else    
                         res.status(data.status).send(data.message)
-                  
                 })
-            
             }
         else
             res.send('No encontre El producto a Agregar')
         
          */
-})
+)
 //ELIMINO EL CARRO COMPLETO
-routerCart.delete('/:cid',async (req,res)=>{
-    const {cid} = req.params
-    delCart(cid)
-    .then(cart=>{
-        console.log('endpoint',cart)
-        if(!cart)
-           return res.status(404).json({status: 'ERROR', message: 'Carro no Existe'})
-        return res.status(200).json({status:'success',message:`${cart.message} con ${cart.prodInCart}`})
-    })
-
-})
+routerCart.delete('/:cid',authPolicies(POLICIES.ADMIN),deleteCart)
 
 //VACIO EL CARRO
-routerCart.delete('/:cid/empty',async (req,res)=>{
-    const {cid} = req.params
-    emptyCart(cid)
-    .then(cart=>{
-        console.log(cart)
-        if(!cart)
-            return res.status(404).json({status: 'ERROR', message: 'Carro no Existe'})
-        return res.status(200).json({status:'success',message:`${cart.message} ${cart.prodInCart} Productos `})
-    })
-
-})
+routerCart.delete('/:cid/empty',authPolicies(POLICIES.USER),emptyCart)
 
 //ELIMINO UN PRODUCTO DEL CARRO
-routerCart.delete('/:cid/products/:pid',async (req,res)=>{
-    const {cid,pid} = req.params
-    delProductCart(cid,pid)
-    .then(cart=>{
-        console.log(cart)
-        if(!cart)
-            res.status(404).json({status: 'ERROR', message: 'Producto'})
-        else
-        res.status(200).json({status:'success',message:'Producto eliminado',payload: cart})
-    })
-
-})
-
-routerCart.delete('/', (req,res)=>{
-    //FILESYSTEM
-    cart.delCart()
-    res.send('Carrito Vacio')
-})
+routerCart.delete('/:cid/products/:pid',authPolicies(POLICIES.USER),deleteProductCart)
 
 //METODO PUT QUNTITY
-routerCart.put('/:cid/products/:pid',async (req,res)=>{
-    const {cid,pid} = req.params
-    const {quantity} = req.body
+routerCart.put('/:cid/products/:pid',authPolicies(POLICIES.USER),updateQuantityCart)
 
-    console.log('ID:',cid, pid)
-    console.log('QUANTITY:',quantity)
 
-    //funcion CART
-    const cartPUT = await updateQuantityCart(cid,pid,quantity)
-    console.log('CART ROUTE',cartPUT)
-    if(cartPUT)
-     return res.status(200).json({status:cartPUT.success,message:cartPUT.message,payload:cartPUT.payload})
-    return res.status(404).json({status:'ERROR',message:'No Hay producto',payload:cartPUT})
+//Ruta de Compra
+routerCart.get('/:cid/purchase',authPolicies(POLICIES.USER),purchaseController)
 
-})
 
 export default routerCart

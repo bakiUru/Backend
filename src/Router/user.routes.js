@@ -1,28 +1,16 @@
 import express from 'express'
-import { userData_Controller,dataAttack_Controller } from '../Controller/user.controller.js'
-import { getUsers, newUserDB } from '../Data/MongoDB/user.dao.js'
+import { getUsers, newUserDB,dataAttack_Controller,userLogin_Controller } from '../Controller/user.controller.js'
 import passport from 'passport'
 
 
 
 const routerUser = express.Router()
 //GET USER
-routerUser.get('/',async (req,res)=>{
-    const {limit,page,asc,query} = req.query
-    console.log(req.query)
-    const users = await getUsers(limit,page,asc,query)
-    res.send(users)
-})
+routerUser.get('/',getUsers)
 
 //ADDNEW USER
-routerUser.post('/sing-up',dataAttack_Controller,userData_Controller, async (req,res)=>{
-    try {
-        const newUser = await newUserDB(req.body)
-    res.send(newUser).status(200)
-    } catch (error) {
-        res.send(error).status(400)
-        }
-})
+routerUser.post('/sing-up',newUserDB)
+
 //ADDNEW USER GOOGLE
 routerUser.get('/google',passport.authenticate('googleRegister',{
     scope:["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"],
@@ -36,8 +24,10 @@ async (req,res)=>{
             }
             })
 
-routerUser.post('/sing-up2',dataAttack_Controller, userData_Controller,
+routerUser.post('/sing-up2',
     passport.authenticate('register', {failureRedirect:'/failregister'}),async(req,res)=>{
+        dataAttack_Controller(req.body)
+        userLogin_Controller(req.body)
         res.send({status:'sucess',message:"User Registred"})
     })
 //FAIL STRATEGY

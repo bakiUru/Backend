@@ -1,5 +1,5 @@
-import productModel from "./Models/product.models.js";
-import { seedProduct } from "./seed/products_seed.js";
+import productModel from "../Models/product.models.js";
+import { seedProduct } from "./products_seed.js";
 
 export const firstSeed = async ()=>{
     try{
